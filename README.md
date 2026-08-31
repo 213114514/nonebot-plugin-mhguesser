@@ -67,6 +67,7 @@ _✨ <怪物猎人猜BOSS> ✨_
 | 配置项 | 必填 | 类型 | 默认值 | 说明 |
 |:-----:|:----:|:----:|:----:|:----:|
 | mhguesser_max_attempts | 否 | int | 10 | 最大尝试次数 |
+| RENDER__PROVIDER | 是 | str | 无 | htmlrender 渲染提供方，需设为 `playwright` |
 
 ## 🎉 使用
 mhstart: 开始游戏
