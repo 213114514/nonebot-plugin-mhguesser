@@ -2,12 +2,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from jinja2 import Environment, FileSystemLoader
-from nonebot.log import logger
-from nonebot_plugin_htmlrender import (
-    CapabilityUnavailable,
-    get_default_application,
-    render_html,
-)
+from nonebot_plugin_htmlrender import get_default_application
 
 env = Environment(
     loader=FileSystemLoader(Path(__file__).parent / "resources/templates"),
@@ -28,18 +23,10 @@ async def _render_pic(html: str) -> bytes:
     """将 HTML 渲染为 PNG 图片字节。
 
     htmlrender 0.8+ 顶层 render_html 不再支持自定义请求头，而 gamekee
-    图片依赖 Referer 防盗链，因此优先通过 PlaywrightAccess 能力租用带请求头
-    的页面手动截图；playwright 能力不可用时回退到 render_html（此时 gamekee
-    图片可能因防盗链 567 无法加载）。
+    图片依赖 Referer 防盗链，因此通过 PlaywrightAccess 能力租用带请求头
+    的页面手动截图。
     """
-    try:
-        playwright = get_default_application().extensions.playwright
-    except CapabilityUnavailable:
-        logger.warning(
-            "htmlrender 未启用 playwright 能力，无法注入请求头，gamekee 图片可能加载失败"
-        )
-        img = await render_html(html, width=width, height=height)
-        return img.data
+    playwright = get_default_application().extensions.playwright
     async with playwright.page(
         viewport={"width": width, "height": height},
         device_scale_factor=2.0,
